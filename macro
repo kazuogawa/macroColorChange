@@ -1,0 +1,43 @@
+Sub PaintTargetCharacter()
+    Dim Target As String
+    Dim FoundCell As Range, SearchArea As Range
+    Dim Addr As String
+    'ここに変換したい文字の前半を書く
+    Target = "actionID"
+    If Target = "False" Then Exit Sub
+    
+    '検索対象範囲
+    Set SearchArea = ActiveSheet.UsedRange
+    
+    '検索実行
+    Set FoundCell = SearchArea.Find(What:=Target, LookIn:=xlValues, _
+                    LookAt:=xlPart, MatchCase:=False, MatchByte:=False)
+                    
+    '検索文字列を含むセルがない場合は終了
+    If FoundCell Is Nothing Then Exit Sub
+    
+    '最初の検索結果のアドレスを格納
+    Addr = FoundCell.Address
+    
+    Do
+        '対象文字の操作のためたプロシージャ呼び出し
+        Call PaintCh(FoundCell, Target)
+        '次の検索を実行
+        Set FoundCell = SearchArea.FindNext(After:=FoundCell)
+        If FoundCell Is Nothing Then Exit Do
+    Loop Until FoundCell.Address = Addr
+End Sub
+
+'上記プロシージャから呼び出されてフォント色の変更と太字化を行う
+Sub PaintCh(FoundCell As Range, Target As String)
+    Dim StartPos As Long
+    
+    StartPos = InStr(1, FoundCell.Value, Target, vbTextCompare)
+    'ここの数字を変更して変化させたい文字数変更してね。前カッコ分を踏まえて文字数を指定すること
+    With FoundCell.Characters(StartPos + 9, 9).Font
+        .Color = vbRed
+        .Bold = True
+    End With
+End Sub
+
+
